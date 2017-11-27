@@ -84,8 +84,99 @@ Description of parameters:
 This step will generate the PSMC-specific input file format, run PSMC, and also run PSMC on 100 bootstrap replicates.
 
 ```bash
+# Generate psmcfa input file
+fq2psmcfa C_mydas.filtered.fa.gz > C_mydas.filtered.psmcfa
 
+# Split for bootstrapping
+splitfa C_mydas.filtered.psmcfa > C_mydas.split.filtered.psmcfa
+
+# Run PSMC on the genome
+psmc -N25 -t15 -r5 -p "4+25*2+4+6" -o C_mydas.filtered.psmc C_mydas.filtered.psmcfa
+
+# Run PSMC on the bootstrapped files
+for b in {1..100}
+   do
+   psmc -N25 -t15 -r5 -b -p "4+25*2+4+6" -o C_mydas.filtered.${b}.bs.psmc C_mydas.split.filtered.psmcfa
+done
+
+# Merge together full and bootstrapped files
+cat \
+   C_mydas.filtered.psmc \
+   C_mydas.filtered.{1..100}.bs.psmc > \
+   C_mydas.filtered.combined.psmc
 ```
 
 
+
+## Step 4: Plot Results
+
+```bash
+psmc_plot.pl \
+   -X50000000 \
+   -p \
+   -g42.8 \
+   -R \
+   -x1000 \
+   -u1.2e-08 \
+   test \
+   C_mydas.filtered.combined.psmc
+```
+
+
+## Step 5:  Additional Plotting functions in R
+This is extra code to further make specific plots frm the PSMC output, in addition to adding a sliding window of sea surface temperature data taken from [XXXXX](xxx).
+```R
+# Load libraries needed
+library(scales)
+library(zoo)
+
+# Open PDF file to write to
+pdf("psmc.plot.pdf", height = 7, width = 10)
+
+# Adjust plot margins
+par(mar = c(4.1, 4.1, 2.1, 4.1))
+
+# Start new empty plot
+plot.new()
+plot.window(xlim = c(10000, 40000000), ylim = c(0, 35), log = "x")
+box()
+axis(1, tck = -0.01, at = c(10000, 100000,1000000,10000000), labels = expression(10^4, 10^5, 10^6, 10^7))
+axis(1, tck = -0.01, at = c(20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 2000000,3000000,4000000,5000000,6000000,7000000,8000000,9000000,20000000,30000000,40000000), labels = F)
+y.axis = seq(0, 35, by = 1)
+axis(2, las = 1)
+axis(2, las = 1, tck = -0.01, at = y.axis, labels = F)
+
+# Load temp data
+b = read.table("temp-data.tsv", sep = "\t", header = T)
+
+# Rescale temperature data to match X axis and take the mean of every 2000 year window
+temps = zoo(rescale(b$Temp, to = c(0, 35)))
+temps.mean = rollapply(temps, width = 2000, FUN = mean, align = "right", by = 200)
+times.center = rollapply(zoo(b$Tbp), width = 200, FUN = median, align = "right", by = 200)
+
+# Add temperature points to the plot
+points(times.center, temps.mean, col = rgb(1, 0, 0), lwd = 1, type = "l")
+
+# Plot each bootstrapped PSMC file in gray color
+for (i in 1:100){
+   a = read.table(paste("test.", i, ".txt", sep = ""), header = F)
+   points(a$V1 + 0.0001, a$V2, col = "grey", type = "l", lwd = 1)
+}
+
+# Plot the overall PSMC results as black line
+a = read.table("test.0.txt", header = F)
+points(a$V1 + 0.0001, a$V2, col = "black", type = "l", lwd = 3)
+
+# Add lines for each major geomagnetic reversal
+abline(v = 780000, lty = "dashed", col = "black")
+abline(v = 2580000, lty = "dashed", col = "black")
+abline(v = 3580000, lty = "dashed", col = "black")
+
+# Add a second Y axis
+x = c(min(b$Temp), seq(from = -15, to = 20, by = 5), max(b$Temp))
+axis(4, las = 1, tck = -0.01, at = rescale(x, to = c(0, 35))[2:(length(x) - 1)], labels = seq(from = -15, to = 20, by = 5))
+
+# Write plot to PDF file
+dev.off()
+```
 
