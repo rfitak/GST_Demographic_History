@@ -4,6 +4,8 @@ Some ancillary data files and custom scripts are available in the [Data](./Data)
 
 1.  [Download and process raw sequencing data](./GST-data-processing.md)
     - Downloading, trimming, and mapping raw sequencing data.
+2. [SNP calling and PSMC analysis](./SNPs-and-PSMC.md)
+    - Identifcation and filtering of SNPs, then demographic reconstruction using PSMC
 
 ## All code and content herein is licensed under:
 ## [GNU General Public License v2.0](./LICENSE)
