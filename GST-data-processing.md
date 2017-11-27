@@ -125,3 +125,19 @@ while read SRA
    
 done < SRR.list
 ```
+Desciption of the parameters:
+- -t 8  :: 8 threads
+- -R $rg  :: add the read group line to the BAM header
+- -M  :: mark shorter split hits as secondary
+- C_mydas.fa  :: indexed reference genome file
+- samtools1.3 view  :: use samtools v1.3 to filter aligned reads
+    - -b  :: xxxx
+    - -q 20  :: xxxx
+    - -f 0x0002  :: xxxx
+    - -F 0x0004  :: xxxx
+    - -F 0x0008  :: xxxx
+    - -T C_mydas.fa  :: indexed reference genome file
+- samtools1.3 sort  :: use samtools v1.3 to sort the BAM file
+    - -T ${SRA}.tmp  :: store temporary sorted files here
+samtools rmdup  :: use the older samtools v0.1.19 to remove duplicate reads
+
