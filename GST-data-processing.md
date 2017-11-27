@@ -21,9 +21,9 @@ while read line
 done < SRR.list
 ```
 Description of parameters:
-    - --split-files :: separate forward and reverse read pairs into separate files
-    - -Z            :: write to standard out
-    - -gzip         :: compress output using gzip
+- --split-files :: separate forward and reverse read pairs into separate files
+- -Z            :: write to standard out
+- -gzip         :: compress output using gzip
 
 
 
