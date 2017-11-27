@@ -124,7 +124,7 @@ psmc_plot.pl \
 
 
 ## Step 5:  Additional Plotting functions in R
-This is extra code to further make specific plots frm the PSMC output, in addition to adding a sliding window of sea surface temperature data taken from [XXXXX](xxx).
+This is extra code to further make specific plots frm the PSMC output, in addition to adding a sliding window of sea surface temperature data taken from [van de Wal et al. 2011 *Climate of the Past*](https://www.clim-past.net/7/1459/2011/).
 ```R
 # Load libraries needed
 library(scales)
