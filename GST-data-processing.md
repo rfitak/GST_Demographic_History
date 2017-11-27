@@ -88,7 +88,8 @@ bwa index \
 
 
 
-### Step 4: Map trimmed reads to reference genome
+## Step 4: Map trimmed reads to reference genome
+Trimmed reads are mapped to the indexed reference genome again using BWA v0.7.12.  Then, the mapped reads are filtered for mapping quality, and only properly-paired reads with both mates mapped are kept using [SAMTOOLS v1.3](https://github.com/samtools/samtools).  Next, the BAM files are sorted, duplicates removed, and indexed also using SAMTOOLS.
 
 ```bash
 # Define a read group in header
@@ -141,3 +142,27 @@ Desciption of the parameters:
     - -T ${SRA}.tmp  :: store temporary sorted files here
 samtools rmdup  :: use the older samtools v0.1.19 to remove duplicate reads
 
+
+
+## Step 5: Merge together the mapping files
+Right now there is a separate BAM file for each read library (8 bam files).  Now, we make a list of these BAM files and merge them all together using SAMTOOLS
+
+```bash
+# Make list of bam files
+ls *.bam > bams.list
+
+# Make a header file using any one of the sorted BAM files
+samtools1.3 view -H SRR446050.sorted.bam > header.txt
+
+# Merge using samtools
+samtools1.3 merge \
+   -h header.txt \
+   -b bams.list \
+   C_mydas.merged.sorted.bam
+
+# Index the merged BAM file
+samtools1.3 index C_mydas.merged.sorted.bam
+
+# Get stats from the merged BAM file
+samtools1.3 stats C_mydas.merged.sorted.bam > C_mydas.merged.sorted.bamstats
+```
