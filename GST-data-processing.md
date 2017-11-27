@@ -25,27 +25,29 @@ Description of parameters:
 - -Z            :: write to standard out
 - -gzip         :: compress output using gzip
 
-### Step 1: Trim sequences
-Next, we trim low-quality bases and reads using [TRIMMOMATIC v0.35](http://www.usadellab.org/cms/?page=trimmomatic).
+### Step 2: Trim sequences
+Next, we trim low-quality bases and reads using [TRIMMOMATIC v0.35](http://www.usadellab.org/cms/?page=trimmomatic).  You will need to change "input" and "output" to be the names of the various files downloaded above.  Trim each file separately.
 
 ```bash
-# Trim reads
-trimmomatic \
-   PE \
-   -threads 8 \
-   input_F.fastq.gz \
-   input_R.fastq.gz \
-   output_F.fastq.gz \
-   output_F.SE.fastq.gz \
-   output_R.fastq.gz \
-   output_R.SE.fastq.gz \
-   ILLUMINACLIP:all.fa:2:30:7 \
-   LEADING:20 \
-   TRAILING:20 \
-   SLIDINGWINDOW:4:20 \
-   AVGQUAL:30 \
-   MINLEN:50
-
+# Trim reads, loop through each SRA file
+while read SRA
+   do
+   trimmomatic \
+      PE \
+      -threads 8 \
+      ${SRA}_F.fastq.gz \
+      ${SRA}_R.fastq.gz \
+      ${SRA}_F.fastq.gz \
+      ${SRA}_F.SE.fastq.gz \
+      ${SRA}_R.fastq.gz \
+      ${SRA}_R.SE.fastq.gz \
+      ILLUMINACLIP:all.fa:2:30:7 \
+      LEADING:20 \
+      TRAILING:20 \
+      SLIDINGWINDOW:4:20 \
+      AVGQUAL:30 \
+      MINLEN:50
+   done < SRR.list
 ```
 Desciption of the parameters:
 - PE :: the input data are paired-end reads
