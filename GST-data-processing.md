@@ -11,7 +11,7 @@ The Run Table describing all the SRA metadata for the study can be downloaded he
 sed '1d' SraRunTable.txt | cut -f7 | head -8 > SRR.list
 ```
 
-The file, [SRR.list](./Data/SRR.list, contains the run IDs for the 8 sequencing libraries to be downloaded. Now they can be downloaded using the commands below.
+The file, [SRR.list](./Data/SRR.list], contains the run IDs for the 8 sequencing libraries to be downloaded. Now they can be downloaded using the commands below.
 
 ```bash
 while read line
@@ -20,6 +20,12 @@ while read line
    echo "Finished $line"
 done < SRR.list
 ```
+Description of parameters:
+    - --split-files :: separate forward and reverse read pairs into separate files
+    - -Z            :: write to standard out
+    - -gzip         :: compress output using gzip
+
+
 
 ```bash
 1.	Trim reads using trimmomatic v0.35:
