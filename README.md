@@ -1,6 +1,5 @@
 # Green Sea Turtle Demographic History
-The code here is to reconstruct the green sea turtle's demographic history from the genome sequence.  Furthermore, the code for a series of simulated histories under various migration scenarios are performed.
-Please follow the links below to get the code and associated descriptions for various analyses and data processing.  The results of this study have been published in Fitak and Johnsen (in review) *Marine Biology*
+The code here is to reconstruct the green sea turtle's demographic history from the genome sequence. The genone sequence was first described by [Wang et al. 2013 *Nature Genetics*](https://www.nature.com/articles/ng.2615). Furthermore, the code for a series of simulated histories under various migration scenarios is made available. Please follow the links below to get the code and associated descriptions for various analyses and data processing. The results of this study have been published in Fitak and Johnsen (in review) *Marine Biology*
 Some ancillary data files and custom scripts are available in the [Data](./Data) folder.
 
 1.  [Download and process raw sequencing data](./GST-data-processing.md)
