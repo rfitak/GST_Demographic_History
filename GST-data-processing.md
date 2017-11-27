@@ -1,7 +1,7 @@
 # Downloading and Processing Raw Sequence Data
 
 
-### Step 1: Download sequence data
+## Step 1: Download sequence data
 Here we download only the raw, short-insert, paired-end sequencing data. Short insert sequences are recommended for SNP identification and thus any downstream SNP-related analyses.  Long-insert sequences are primarily for scaffolding and structural analyses.  To download the data from the Sequence Read Archive (SRA database), we use the NCBI [SRATOOLKIT v2.8.2](https://github.com/ncbi/sra-tools).
 
 The Run Table describing all the SRA metadata for the study can be downloaded here [SAMN02981410 Run Table](http://www.ncbi.nlm.nih.gov/Traces/study/?acc=SAMN02981410).  It also available here as [SraRunTable.txt](./Data/SraRunTable.txt).
@@ -24,7 +24,9 @@ Description of parameters:
 - --split-files :: separate forward and reverse read pairs into separate files
 - -gzip         :: compress output using gzip
 
-### Step 2: Trim sequences
+
+
+## Step 2: Trim sequences
 Next, we trim low-quality bases and reads using [TRIMMOMATIC v0.35](http://www.usadellab.org/cms/?page=trimmomatic).  The code loops through each of the 8 pairs of SRA files (16 in total) separately.
 
 ```bash
@@ -67,7 +69,9 @@ Desciption of the parameters:
  - AVGQUAL:30 :: remove the entire read if the average quality is < 30
  - MINLEN:50 :: remove reads less than 50 bases after quality trimming
 
-### Step 3: Download and index reference genome
+
+
+## Step 3: Download and index reference genome
 The *C. mydas* genome is downloaded from GenBank and then indexed using [BWA v0.7.12](http://bio-bwa.sourceforge.net).
 
 ```bash
@@ -82,4 +86,42 @@ bwa index \
    C_mydas.fa
 ```
 
+
+
 ### Step 4: Map trimmed reads to reference genome
+
+```bash
+# Define a read group in header
+rg="@RG\tID:Cmydas\tSM:Cmydas"
+
+# Begin mapping, looping through each SRA file pair of trimmed reads
+while read SRA
+   do
+   bwa mem \
+      -t 8 \
+      -R $rg \
+      -M \
+      C_mydas.fa \
+      ${SRA}_F.trimmed.fastq.gz \
+      ${SRA}_R.trimmed.fastq.gz | \
+      samtools1.3 view \
+         -b \
+         -q 20 \
+         -f 0x0002 \
+         -F 0x0004 \
+         -F 0x0008 \
+         -T C_mydas.fa \
+         - | \
+      samtools1.3 sort -T ${SRA}.tmp \
+         - | \
+      samtools rmdup \
+         - ${SRA}.sorted.bam
+   
+   # Index the BAM file
+   samtools1.3 index ${SRA}.sorted.bam
+
+   # Get mapping stats from the BAM file
+   samtools1.3 stats ${SRA}.sorted.bam > ${SRA}.bamstats
+   
+done < SRR.list
+```
