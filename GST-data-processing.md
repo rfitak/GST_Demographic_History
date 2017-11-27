@@ -2,7 +2,7 @@
 
 
 ### Step 1: Download sequence data
-Here we download only the raw, short-insert, paired-end sequencing data. Short insert sequences are recommended for SNP identification and thus any downstream SNP-related analyses.  Long-insert sequences are primarily for scaffolding and structural analyses.  To download the data from the Sequence Read Archive (SRA database), we use the NCBI [SRATOOLKIT](https://github.com/ncbi/sra-tools).
+Here we download only the raw, short-insert, paired-end sequencing data. Short insert sequences are recommended for SNP identification and thus any downstream SNP-related analyses.  Long-insert sequences are primarily for scaffolding and structural analyses.  To download the data from the Sequence Read Archive (SRA database), we use the NCBI [SRATOOLKIT v2.8.2](https://github.com/ncbi/sra-tools).
 
 The Run Table describing all the SRA metadata for the study can be downloaded here [SAMN02981410 Run Table](http://www.ncbi.nlm.nih.gov/Traces/study/?acc=SAMN02981410).  It also available here as [SraRunTable.txt](./Data/SraRunTable.txt).
 
@@ -14,19 +14,18 @@ sed '1d' SraRunTable.txt | cut -f7 | head -8 > SRR.list
 The file, [SRR.list](./Data/SRR.list], contains the run IDs for the 8 sequencing libraries to be downloaded. Now they can be downloaded using the commands below.
 
 ```bash
-while read line
+while read SRA
    do
-   fastq-dump --split-files -Z -gzip $line > $line.fq.gz
-   echo "Finished $line"
+   fastq-dump --split-files -gzip $SRA
+   echo "Finished $SRA"
 done < SRR.list
 ```
 Description of parameters:
 - --split-files :: separate forward and reverse read pairs into separate files
-- -Z            :: write to standard out
 - -gzip         :: compress output using gzip
 
 ### Step 2: Trim sequences
-Next, we trim low-quality bases and reads using [TRIMMOMATIC v0.35](http://www.usadellab.org/cms/?page=trimmomatic).  You will need to change "input" and "output" to be the names of the various files downloaded above.  Trim each file separately.
+Next, we trim low-quality bases and reads using [TRIMMOMATIC v0.35](http://www.usadellab.org/cms/?page=trimmomatic).  The code loops through each of the 8 pairs of SRA files (16 in total) separately.
 
 ```bash
 # Trim reads, loop through each SRA file
@@ -35,12 +34,12 @@ while read SRA
    trimmomatic \
       PE \
       -threads 8 \
-      ${SRA}_F.fastq.gz \
-      ${SRA}_R.fastq.gz \
-      ${SRA}_F.fastq.gz \
-      ${SRA}_F.SE.fastq.gz \
-      ${SRA}_R.fastq.gz \
-      ${SRA}_R.SE.fastq.gz \
+      ${SRA}_1.fastq.gz \
+      ${SRA}_2.fastq.gz \
+      ${SRA}_F.trimmed.fastq.gz \
+      ${SRA}_F.SE.trimmed.fastq.gz \
+      ${SRA}_R.trimmed.fastq.gz \
+      ${SRA}_R.SE.trimmed.fastq.gz \
       ILLUMINACLIP:all.fa:2:30:7 \
       LEADING:20 \
       TRAILING:20 \
@@ -52,8 +51,8 @@ while read SRA
 Desciption of the parameters:
 - PE :: the input data are paired-end reads
 - -threads 8 :: use four CPUs (threads)
-- input_F.fastq.gz :: the name of the forward reads file
-- input_R.fastq.gz :: the name of the reverse reads file
+- ${SRA}\_1.fastq.gz :: the name of the forward reads file
+- ${SRA}\_2.fastq.gz :: the name of the reverse reads file
 - name of the trimmed and paired forward reads output file
 - name of the trimmed and unpaired forward reads output file
 - name of the trimmed and paired reverse reads output file
@@ -67,3 +66,20 @@ Desciption of the parameters:
  - SLIDINGWINDOW:4:20 :: using a 4-base window, remove the last base if average Q < 20
  - AVGQUAL:30 :: remove the entire read if the average quality is < 30
  - MINLEN:50 :: remove reads less than 50 bases after quality trimming
+
+### Step 3: Download and index reference genome
+The *C. mydas* genome is downloaded from GenBank and then indexed using [BWA v0.7.12](http://bio-bwa.sourceforge.net).
+
+```bash
+# Download reference genome
+wget https://ftp.ncbi.nih.gov/genomes/Chelonia_mydas/CHR_Un/8469_ref_CheMyd_1.0_chrUn.fa.gz
+gunzip 8469_ref_CheMyd_1.0_chrUn.fa.gz
+mv 8469_ref_CheMyd_1.0_chrUn.fa C_mydas.fa
+
+# Build Index
+bwa index \
+   -a bwtsw \
+   C_mydas.fa
+```
+
+### Step 4: Map trimmed reads to reference genome
