@@ -25,10 +25,43 @@ Description of parameters:
 - -Z            :: write to standard out
 - -gzip         :: compress output using gzip
 
-
+### Step 1: Trim sequences
+Next, we trim low-quality bases and reads using [TRIMMOMATIC v0.35](http://www.usadellab.org/cms/?page=trimmomatic).
 
 ```bash
-1.	Trim reads using trimmomatic v0.35:
-a.	trimmomatic PE -threads 8 input_F.fastq.gz input_R.fastq.gz output_F.fastq.gz output_F.SE.fastq.gz output_R.fastq.gz output_R.SE.fastq.gz ILLUMINACLIP:all.fa:2:30:7 LEADING:20 TRAILING:20 SLIDINGWINDOW:4:20 AVGQUAL:30 MINLEN:50
+# Trim reads
+trimmomatic \
+   PE \
+   -threads 8 \
+   input_F.fastq.gz \
+   input_R.fastq.gz \
+   output_F.fastq.gz \
+   output_F.SE.fastq.gz \
+   output_R.fastq.gz \
+   output_R.SE.fastq.gz \
+   ILLUMINACLIP:all.fa:2:30:7 \
+   LEADING:20 \
+   TRAILING:20 \
+   SLIDINGWINDOW:4:20 \
+   AVGQUAL:30 \
+   MINLEN:50
 
 ```
+Desciption of the parameters:
+- PE :: the input data are paired-end reads
+- -threads 8 :: use four CPUs (threads)
+- input_F.fastq.gz :: the name of the forward reads file
+- input_R.fastq.gz :: the name of the reverse reads file
+- name of the trimmed and paired forward reads output file
+- name of the trimmed and unpaired forward reads output file
+- name of the trimmed and paired reverse reads output file
+- name of the trimmed and unpaired reverse reads output file
+- ILLUMINACLIP:all.fa:2:30:7 :: fasta file of adapter sequences to trim, see file [all.fa](./Data/all.fa)
+  * 2 :: seedMismatches: specifies the maximum mismatch count which will still allow a full match to be performed
+  * 30 :: palindromeClipThreshold: specifies how accurate the match between the two 'adapter ligated' reads must be for PE palindrome read alignment.
+  * 7 :: simpleClipThreshold: specifies how accurate the match between any adapter etc. sequence must be against a read.
+ - LEADING:20 :: trim bases from start of the read with a Q < 20
+ - TRAILING:20 :: trim bases from end of the read with a Q < 20
+ - SLIDINGWINDOW:4:20 :: using a 4-base window, remove the last base if average Q < 20
+ - AVGQUAL:30 :: remove the entire read if the average quality is < 30
+ - MINLEN:50 :: remove reads less than 50 bases after quality trimming
