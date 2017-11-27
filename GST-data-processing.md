@@ -131,11 +131,11 @@ Desciption of the parameters:
 - -M  :: mark shorter split hits as secondary
 - C_mydas.fa  :: indexed reference genome file
 - samtools1.3 view  :: use samtools v1.3 to filter aligned reads
-    - -b  :: xxxx
-    - -q 20  :: xxxx
-    - -f 0x0002  :: xxxx
-    - -F 0x0004  :: xxxx
-    - -F 0x0008  :: xxxx
+    - -b  :: output file in BAM format
+    - -q 20  :: only include reads with mapping quality >=20
+    - -f 0x0002  :: only include reads with all bits set in INT set in FLAG (properly paired)
+    - -F 0x0004  :: only include reads with none of the bits set in INT set in FLAG (read unmapped)
+    - -F 0x0008  :: only include reads with none of the bits set in INT set in FLAG (mate unmapped)
     - -T C_mydas.fa  :: indexed reference genome file
 - samtools1.3 sort  :: use samtools v1.3 to sort the BAM file
     - -T ${SRA}.tmp  :: store temporary sorted files here
