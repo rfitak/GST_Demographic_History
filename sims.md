@@ -122,6 +122,7 @@ done
 
 
 ## Scenario 2:  Simulating variable migration, with rates fixed post Brunhes-Matuyama reversal
+The scenario is very similar to the first, but rather than migration ONLY during the MPT, this time migration between the two demes is permanent post the Brunhes-Matuyama reversal.  In others, the reversal initiated contact between two populations 775k years ago.  The migrations rates tested are the same.
 
 ```bash
 # Setup Folder
@@ -133,8 +134,8 @@ for i in {1..470}
 do
 
 # Get the migration rate and replicate number
-M=$(sed -n "${i}"p ../migrations2.list | cut -d" " -f1)
-n=$(sed -n "${i}"p ../migrations2.list | cut -d" " -f2)
+M=$(sed -n "${i}"p ../migrations.list | cut -d" " -f1)
+n=$(sed -n "${i}"p ../migrations.list | cut -d" " -f2)
 
 # Rescale migration rate by 4N
 m=$(awk "BEGIN {print ${M}*4*50906}")
