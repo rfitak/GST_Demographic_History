@@ -6,6 +6,8 @@ Some ancillary data files and custom scripts are available in the [Data](./Data)
     - Downloading, trimming, and mapping raw sequencing data.
 2. [SNP calling and PSMC analysis](./SNPs-and-PSMC.md)
     - Identifcation and filtering of SNPs, then demographic reconstruction using PSMC
+3. [Simulating demographic history](./sims.md)
+    - SImulating the various demographic scenarios and comparing with the observed demographic history
 
 ## All code and content herein is licensed under:
 ## [GNU General Public License v2.0](./LICENSE)
