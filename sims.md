@@ -295,3 +295,64 @@ while read i
 done < ../mutations.list
 cd ..
 ```
+
+The remaining calculation of D will be performed in R.  First, we need a function that calculates the measure D.  The function below will do this.  It will calculate all pairwise measures of D and output into a matrix.
+```R
+# JSD
+# Function to calculate Jensen-Shannon divergence
+   # Arumugam et al. 2011 (Nature)
+# "the square root of JSD is a real distance metric (Endres & Schindelin, 2003;
+# which is cited as ref. 59 in the supplement of Arumugam et al 2011). 
+# This is the reason why we used the square root and not JSD itself.
+   # data.dist=dist.JSD(data)
+
+dist.JSD <- function(inMatrix, pseudocount=0.000001, ...) {
+	KLD <- function(x,y) sum(x *log(x/y))
+	JSD<- function(x,y) sqrt(0.5 * KLD(x, (x+y)/2) + 0.5 * KLD(y, (x+y)/2))
+	matrixColSize <- length(colnames(inMatrix))
+	matrixRowSize <- length(rownames(inMatrix))
+	colnames <- colnames(inMatrix)
+	resultsMatrix <- matrix(0, matrixColSize, matrixColSize)
+        
+  inMatrix = apply(inMatrix,1:2,function(x) ifelse (x==0,pseudocount,x))
+
+	for(i in 1:matrixColSize) {
+		for(j in 1:matrixColSize) { 
+			resultsMatrix[i,j]=JSD(as.vector(inMatrix[,i]),
+			as.vector(inMatrix[,j]))
+		}
+	}
+	colnames -> colnames(resultsMatrix) -> rownames(resultsMatrix)
+	as.dist(resultsMatrix)->resultsMatrix
+	attr(resultsMatrix, "method") <- "dist"
+	return(resultsMatrix) 
+ }
+```
+
+Next, we calculate D for each simulation compared with the observed data.
+
+```R
+# Load observed distribution
+obs = read.table("obs.tMRCAbins.tsv", sep = "\t", header = F)[, 1:64]
+
+# Load simulated distributions (Sim1)
+sims = read.table("Sim1.tMRCAbins.tsv", sep = "\t", header = F)[, 1:66]
+data = rbind(as.numeric(obs), sims[, 3:66])
+dist = as.matrix(dist.JSD(t(data)))
+results = dist[, 1]
+write(results, file = "Sim1.JS.distances", ncolumns = 1)
+
+# Load simulated distributions (Sim2)
+sims = read.table("Sim2.tMRCAbins.tsv", sep = "\t", header = F)[, 1:66]
+data = rbind(as.numeric(obs), sims[, 3:66])
+dist = as.matrix(dist.JSD(t(data)))
+results = dist[, 1]
+write(results, file = "Sim2.JS.distances", ncolumns = 1)
+
+# Load simulated distributions (Sim3)
+sims = read.table("Sim3.tMRCAbins.tsv", sep = "\t", header = F)[, 1:66]
+data = rbind(as.numeric(obs), sims[, 3:66])
+dist = as.matrix(dist.JSD(t(data)))
+results = dist[, 1]
+write(results, file = "Sim3.JS.distances", ncolumns = 1)
+```
