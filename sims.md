@@ -188,7 +188,7 @@ In this set of simualtions, we assume a single deme (population) and during the 
 mkdir SIM3
 cd SIM3/
 
-# Loop through each set of parameters in "migrations.list"
+# Loop through each set of parameters in "mutations.list"
 for i in {1..460}
 do
 
@@ -229,4 +229,69 @@ rm -rf $sim.eps $sim.gp $sim.par $sim.pdf $sim.txt
 
 # End loop
 done
+```
+
+
+## Putting it all together
+Now we use various commands, especially in R, to calculate the difference between the simulated demographic history and the observed demographic history.  For each simulation, we use the frequency of coalescent events across the 64 atomic time intervals reported by PSMC as a probability distribution. Then, we use a distance metric, D, called the [Jensen-Shannon divergence](http://ieeexplore.ieee.org/document/1207388/).  D ranges from 0 to 1, with 0 being a perfect fit and 1 being completely different.  Simulations with a smaller D are closer in their history to the observed data than larger values of D.
+
+First, we build a table of the probability distributions for each simulation
+```bash
+# For the observed data
+awk '/RD.20/{f=1}/\/\//{f=0}f&&/RS/{print $2,$5,$6}' \
+   C_mydas.filtered.psmc | \
+   cut -f3 -d" " | \
+   tr "\n" "\t" > obs.tMRCAbins.tsv
+echo "" >> obs.tMRCAbins.tsv
+
+# For SIM1
+cd SIM1
+while read i
+   do
+   i=$(echo "$i" | cut -d" " -f1)
+   for n in {1..10}
+      do
+      a=$(awk '/RD.20/{f=1}/\/\//{f=0}f&&/RS/{print $2,$5,$6}' \
+         /work/frr6/SIMS/Sim1.${i}.${n}.psmc | \
+         cut -f3 -d" " | \
+         tr "\n" "\t")
+      echo -e "${i}\t${n}\t${a}" >> Sim1.tMRCAbins.tsv
+      echo "Finished $i $n"
+   done
+done < ../migrations.list
+cd ..
+
+# For SIM2
+cd SIM2
+while read i
+   do
+   i=$(echo "$i" | cut -d" " -f1)
+   for n in {1..10}
+      do
+      a=$(awk '/RD.20/{f=1}/\/\//{f=0}f&&/RS/{print $2,$5,$6}' \
+         /work/frr6/SIMS/Sim2.${i}.${n}.psmc | \
+         cut -f3 -d" " | \
+         tr "\n" "\t")
+      echo -e "${i}\t${n}\t${a}" >> Sim2.tMRCAbins.tsv
+      echo "Finished $i $n"
+   done
+done < ../migrations.list
+cd ..
+
+# For SIM3
+cd SIM3
+while read i
+   do
+   i=$(echo "$i" | cut -d" " -f1)
+   for n in {1..10}
+      do
+      a=$(awk '/RD.20/{f=1}/\/\//{f=0}f&&/RS/{print $2,$5,$6}' \
+         /work/frr6/SIMS/Sim1.${i}.${n}.psmc | \
+         cut -f3 -d" " | \
+         tr "\n" "\t")
+      echo -e "${i}\t${n}\t${a}" >> Sim3.tMRCAbins.tsv
+      echo "Finished $i $n"
+   done
+done < ../mutations.list
+cd ..
 ```
