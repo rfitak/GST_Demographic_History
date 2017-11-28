@@ -10,9 +10,44 @@ This section provides the code for the simulations in our paper using [msHOT-lit
     - we varied the mutation rate on a log scale from 1% to 1000% the background rate
 
 Here is how the general parameters for the simulations were defined.
+First, we generated the ms command to match the observed population history. The program PSMC does this for us:
+```bash
+# Get ms command from observed PSMC output
+psmc2history.pl \
+   C_mydas.filtered.combined.psmc | \
+   history2ms.pl \
+   -n2 \
+   -L15000000 \
+   -u1.2e-08 \
+   -g42.8 \
+   -r1
+```
+Parameters:
+- -n2  :: number of chromosomes to simulate (2)
+- -L15000000  :: length of each chromosome or sequence (15 megabases)
+- -u1.2e-08  :: mutation rate (1.2e-8)
+- -g42.8  :: generation time in years (42.8), taken from [Seminoff 2004](http://www.iucnredlist.org/details/4615/0)
+- -r1  :: number of replicates (1)
+
+Output:
+- Result is an initial Theta (T) = 81649.7075005211
+- Result is an initial recombination (r) = 16092.2966989892
+
+## Define simulation parameters:
 - Sequence length and number
     - 150 15-megabase fragments per individual = 2.25 GB
-    - This is ~ the genoem size reported in Wang et al. 2013
+    - This is approximately the genome size reported in [Wang et al. 2013 *Nature Genetics*](https://www.nature.com/articles/ng.2615)
+    - 2 haploid individuals are sampled at the end, which corresponds to a single, diploid individual's genome
+- Extant Effective Population size, N
+    - Theta = 81649.7075005211 = 4Nu (definition of theta)
+    - N = (81649.7075005211) / (4 \* 1.2e-08 \* 15000000) = 113402
+- Historical Effective Population size, No
+    - From the ms command produces above, the historical population size is 0.4489 \* N
+    - No = 0.4489 \* 113402 = 50,906
+- New theta parameter for simulations, (-t), scaled by the new No
+    - Theta = 4 \* No \* u
+
+
 
 
 ## Scenario 1:  Simulating variable migration
