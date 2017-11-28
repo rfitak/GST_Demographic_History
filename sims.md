@@ -61,11 +61,14 @@ Output:
       - 11,682.2 / (4 \* 50906) = 0.05737 scaled generations
       - 28,037.4 / (4 \* 50906) = 0.13769 scaled generations
     - The Brunhes-Matuyama Reversal occurred 0.775 mya, or 18,107.5 generations in the past (g = 42.8 years)
-      - 18,224.3 / (4 \* 50906) = 0.088926 scaled generations
+      - 18,107.5 / (4 \* 50906) = 0.088926 scaled generations
+    - The Brunhes-Matuyama Reversal occurred 0.775 mya, and we flank this by 5,000 years on each side for a 10,000 year window from 0.77 - 0.78 mya, or 17,990.7 - 18,224.3 generations in the past (g = 42.8 years)
+      - 17,990.7 / (4 \* 50906) = 0.0883523 scaled generations
+      - 18,224.3 / (4 \* 50906) = 0.0894997 scaled generations
       
       
 ## Scenario 1:  Simulating variable migration
-We start with the demes (populations) that are independent, and only share migrants during the MPT.  The rate of migration during the MPT between the two demes is varied from 0-1.  In total, 47 migration rates are used, and can be viewed in the file [migrations.list](./Data/migrations.list).  Each simulated migration rate is repeated 10 times, for a total of 470 simulated histories.
+We start with the demes (populations) that are independent, and only share migrants during the MPT.  The rate of migration during the MPT between the two demes is varied from 0-1.  In total, 56 migration rates are used, and can be viewed in the file [migrations.list](./Data/migrations.list).  Each simulated migration rate is repeated 10 times, for a total of 560 simulated histories.
 
 ```bash
 # Setup Folder
@@ -73,7 +76,7 @@ mkdir SIM1
 cd SIM1/
 
 # Loop through each set of parameters in "migrations.list"
-for i in {1..470}
+for i in {1..560}
 do
 
 # Get the migration rate and replicate number
@@ -130,7 +133,7 @@ mkdir SIM2
 cd SIM2/
 
 # Loop through each set of parameters in "migrations.list"
-for i in {1..470}
+for i in {1..560}
 do
 
 # Get the migration rate and replicate number
@@ -162,6 +165,58 @@ psmc -N25 -t15 -r5 -p "4+25*2+4+6" -o ${sim}.psmc ${sim}.psmcfa
 psmc_plot.pl \
    -X50000000 \
    -p \
+   -g42.8 \
+   -R \
+   -x10000 \
+   -u1.2e-08 \
+   ${sim} \
+   ${sim}.psmc
+
+# Remove uneeded files
+rm -rf $sim.eps $sim.gp $sim.par $sim.pdf $sim.txt
+
+# End loop
+done
+```
+
+
+## Scenario 3:  Simulating a mutation rate increase during the Brunhes-Matuyama reversal
+In this set of simualtions, we assume a single deme (population) and during the reversal there is more ionizing radiation present and mutation rates are affected.  To encode this, we simply adjust 'theta' during the reversal to account for the increased mutation rate.  The rates are reflected as a percentage of the background rate (1.2e-08). In total, 46 migration rates are used, from 1% to 1000% the background rate.  With 10 replicates per rate, 460 simulations were performed in total.
+
+```bash
+# Setup Folder
+mkdir SIM3
+cd SIM3/
+
+# Loop through each set of parameters in "migrations.list"
+for i in {1..460}
+do
+
+# Get the mutation rate and replicate number
+t=$(sed -n "${SLURM_ARRAY_TASK_ID}"p ../mutations.list | cut -d" " -f1)
+n=$(sed -n "${SLURM_ARRAY_TASK_ID}"p ../mutations.list | cut -d" " -f2)
+
+# Assign simulation ID
+sim="Sim3.${t}.${n}"
+
+# Run ms simulation
+msHOT-lite 2 150 \
+   -t 36652.32 \
+   -r 7223.8319878 \
+   15000000 \
+   -l \
+   -en 0.0883523 1 $t \
+   -en 0.0894997 1 1 > ${sim}.txt
+   
+# Convert to psmcfa file format
+ms2psmcfa.pl ${sim}.txt > ${sim}.psmcfa
+
+# Run PSMC on simulated history
+psmc -N25 -t15 -r5 -p "4+25*2+4+6" -o ${sim}.psmc ${sim}.psmcfa
+
+# Generate output plots
+psmc_plot.pl \
+   -X50000000 \
    -g42.8 \
    -R \
    -x10000 \
