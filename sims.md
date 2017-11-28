@@ -119,3 +119,58 @@ rm -rf $sim.eps $sim.gp $sim.par $sim.pdf $sim.txt
 # End loop
 done
 ```
+
+
+## Scenario 2:  Simulating variable migration, with rates fixed post Brunhes-Matuyama reversal
+
+```bash
+# Setup Folder
+mkdir SIM2
+cd SIM2/
+
+# Loop through each set of parameters in "migrations.list"
+for i in {1..470}
+do
+
+# Get the migration rate and replicate number
+M=$(sed -n "${i}"p ../migrations2.list | cut -d" " -f1)
+n=$(sed -n "${i}"p ../migrations2.list | cut -d" " -f2)
+
+# Rescale migration rate by 4N
+m=$(awk "BEGIN {print ${M}*4*50906}")
+
+# Assign simulation ID
+sim="Sim2.${M}.${n}"
+
+# Run ms simulation
+msHOT-lite 2 150 \
+   -t 36652.32 \
+   -r 7223.8319878 \
+   15000000 \
+   -I 2 2 0 $m \
+   -l \
+   -em 0.088926 2 1 0 > ${sim}.txt
+   
+# Convert to psmcfa file format
+ms2psmcfa.pl ${sim}.txt > ${sim}.psmcfa
+
+# Run PSMC on simulated history
+psmc -N25 -t15 -r5 -p "4+25*2+4+6" -o ${sim}.psmc ${sim}.psmcfa
+
+# Generate output plots
+psmc_plot.pl \
+   -X50000000 \
+   -p \
+   -g42.8 \
+   -R \
+   -x10000 \
+   -u1.2e-08 \
+   ${sim} \
+   ${sim}.psmc
+
+# Remove uneeded files
+rm -rf $sim.eps $sim.gp $sim.par $sim.pdf $sim.txt
+
+# End loop
+done
+```
