@@ -4,9 +4,9 @@ This section provides the code for the simulations in our paper using [msHOT-lit
     - we varied the migration rate in log10 scale from 0-1.
     - MPT occurred from 0.5 - 1.2 million years ago (mya)
 2.  Two demes (populations) that share migrants since the Brunhes-Matuyama magnetic polarity reversal
-    - the reversal occurred 0.78 mya, and the populations share migrants ever since
+    - the reversal occurred 0.775 mya, and the populations share migrants ever since
 3.  A single deme with a mutation rate increase (burst) during the Brunhes-Matuyama magnetic polarity reversal
-    - the reversal occurred 0.78 mya, and we included a 10,000 year window flanking the reversal
+    - the reversal occurred 0.775 mya, and we included a 10,000 year window flanking the reversal
     - we varied the mutation rate on a log scale from 1% to 1000% the background rate
 
 Here is how the general parameters for the simulations were defined.
@@ -44,24 +44,49 @@ Output:
 - Historical Effective Population size, No
     - From the ms command produces above, the historical population size is 0.4489 \* N
     - No = 0.4489 \* 113402 = 50,906
-- New theta parameter for simulations, (-t), scaled by the new No
+- New theta parameter for simulations, (-t), scaled by the new No and by 15 megabase fragment size
     - Theta = 4 \* No \* u
-
-
-
-
+    - Theta = 4 \* 50906 \* 1.2e-08 \* 15000000
+    - Theta = 36652.32
+- New recombination parameter for simulations, (-r), scaled by the new No and by 15 megabase fragment size
+    - r = 4 \* No \* p, where p = recombination rate
+    - r from observed output was 16092.2966989892, and must be rescaled to new No
+      - 16092.2966989892 = 4 \* 113402 \* p
+      - p = 0.03547621889
+    - New r = 4 \* 50906 \* 0.03547621889
+    - r = 7223.8319878
+- Scaling time points
+    - all times are scaled by 4No generations
+    - MPT = 0.5 - 1.2 mya, or 11,682.2 - 28,037.4 generations in the past (g = 42.8 years)
+      - 11,682.2 / (4 \* 50906) = 0.05737 scaled generations
+      - 28,037.4 / (4 \* 50906) = 0.13769 scaled generations
+    - The Brunhes-Matuyama Reversal occurred 0.775 mya, or 18,107.5 generations in the past (g = 42.8 years)
+      - 18,224.3 / (4 \* 50906) = 0.088926 scaled generations
+      
+      
 ## Scenario 1:  Simulating variable migration
-
+We start with the demes (populations) that are independent, and only share migrants during the MPT.  The rate of migration during the MPT between the two demes is varied from 0-1.  In total, 47 migration rates are used, and can be viewed in the file [migrations.list](./Data/migrations.list).  Each simulated migration rate is repeated 10 times, for a total of 470 simulated histories.
 
 ```bash
-cd /work/frr6/SIMS/
+# Setup Folder
+mkdir SIM1
+cd SIM1/
 
-M=$(sed -n "${SLURM_ARRAY_TASK_ID}"p ../migrations.list | cut -d" " -f1)
-n=$(sed -n "${SLURM_ARRAY_TASK_ID}"p ../migrations.list | cut -d" " -f2)
+# Loop through each set of parameters in "migrations.list"
+for i in {1..470}
+do
 
+# Get the migration rate and replicate number
+M=$(sed -n "${i}"p ../migrations.list | cut -d" " -f1)
+n=$(sed -n "${i}"p ../migrations.list | cut -d" " -f2)
+
+# Rescale migration rate by 4N
 m=$(awk "BEGIN {print ${M}*4*50906}")
+
+# Assign simulation ID
 sim="Sim1.${M}.${n}"
 
+# Run ms simulation
 msHOT-lite 2 150 \
    -t 36652.32 \
    -r 7223.8319878 \
@@ -71,10 +96,13 @@ msHOT-lite 2 150 \
    -l \
    -em 0.13769 2 1 0 > ${sim}.txt
    
+# Convert to psmcfa file format
 ms2psmcfa.pl ${sim}.txt > ${sim}.psmcfa
 
+# Run PSMC on simulated history
 psmc -N25 -t15 -r5 -p "4+25*2+4+6" -o ${sim}.psmc ${sim}.psmcfa
 
+# Generate output plots
 psmc_plot.pl \
    -X50000000 \
    -p \
@@ -85,6 +113,9 @@ psmc_plot.pl \
    ${sim} \
    ${sim}.psmc
 
+# Remove uneeded files
 rm -rf $sim.eps $sim.gp $sim.par $sim.pdf $sim.txt
 
+# End loop
+done
 ```
