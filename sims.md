@@ -356,3 +356,25 @@ dist = as.matrix(dist.JSD(t(data)))
 results = dist[, 1]
 write(results, file = "Sim3.JS.distances", ncolumns = 1)
 ```
+
+Here, we build a final data table of our results (Results.table), which we will eventually store and use for various plots in R.
+
+```bash
+# Sim 1
+cat \
+   <(echo -e "Sim\tm_or_u\trep\tJSD) \
+   <(paste <(cat migrations.list | sed "s/^./Sim1 &/g") Sim1.tMRCAbins.tsv) | \
+   tr " " "\t" > Results.table
+
+# Sim 2
+paste \
+   <(cat migrations.list | sed "s/^./Sim2 &/g") \
+   Sim2.tMRCAbins.tsv | \
+   tr " " "\t" >> Results.table
+
+# Sim 3
+paste \
+   <(cat mutations.list | sed "s/^./Sim3 &/g") \
+   Sim3.tMRCAbins.tsv | \
+   tr " " "\t" >> Results.table
+```
