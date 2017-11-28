@@ -1,14 +1,18 @@
 # Simulating various demographic histories
-This section provides the code for the simulations in our paper using [msHOT-lite](https://github.com/lh3/foreign/tree/master/msHOT-lite).  We simulated two different scenarios, with 10 simulations for each set of parameters.  The parameters were selected to match that from green sea turtles (e.g., genome size), and two chromosomes (1 diploid genome) was sampled at the end of each simulation.  The parameters are further described below. The two simulated scenarios included: 
+This section provides the code for the simulations in our paper using [msHOT-lite](https://github.com/lh3/foreign/tree/master/msHOT-lite).  We simulated three different scenarios, with 10 simulations for each set of parameters.  The parameters were selected to match that from green sea turtles (e.g., genome size), and two chromosomes (1 diploid genome) was sampled at the end of each simulation.  The parameters are further described below. The two simulated scenarios included: 
 1.  Two demes (populations) that share migrants duing the mid-Pleistocene transition (MPT)
     - we varied the migration rate in log10 scale from 0-1.
     - MPT occurred from 0.5 - 1.2 million years ago (mya)
-2.  A single deme with a mutation rate increase (burst) during the Brunhes-Matuyama magnetic polarity reversal
+2.  Two demes (populations) that share migrants since the Brunhes-Matuyama magnetic polarity reversal
+    - the reversal occurred 0.78 mya, and the populations share migrants ever since
+3.  A single deme with a mutation rate increase (burst) during the Brunhes-Matuyama magnetic polarity reversal
     - the reversal occurred 0.78 mya, and we included a 10,000 year window flanking the reversal
     - we varied the mutation rate on a log scale from 1% to 1000% the background rate
 
 Here is how the general parameters for the simulations were defined.
-- Sequence length
+- Sequence length and number
+    - 150 15-megabase fragments per individual = 2.25 GB
+    - This is ~ the genoem size reported in Wang et al. 2013
 
 
 ## Scenario 1:  Simulating variable migration
