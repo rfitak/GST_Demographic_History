@@ -252,10 +252,10 @@ while read i
    for n in {1..10}
       do
       a=$(awk '/RD.20/{f=1}/\/\//{f=0}f&&/RS/{print $2,$5,$6}' \
-         /work/frr6/SIMS/Sim1.${i}.${n}.psmc | \
+         Sim1.${i}.${n}.psmc | \
          cut -f3 -d" " | \
          tr "\n" "\t")
-      echo -e "${i}\t${n}\t${a}" >> Sim1.tMRCAbins.tsv
+      echo -e "${i}\t${n}\t${a}" >> ../Sim1.tMRCAbins.tsv
       echo "Finished $i $n"
    done
 done < ../migrations.list
@@ -269,10 +269,10 @@ while read i
    for n in {1..10}
       do
       a=$(awk '/RD.20/{f=1}/\/\//{f=0}f&&/RS/{print $2,$5,$6}' \
-         /work/frr6/SIMS/Sim2.${i}.${n}.psmc | \
+         Sim2.${i}.${n}.psmc | \
          cut -f3 -d" " | \
          tr "\n" "\t")
-      echo -e "${i}\t${n}\t${a}" >> Sim2.tMRCAbins.tsv
+      echo -e "${i}\t${n}\t${a}" >> ../Sim2.tMRCAbins.tsv
       echo "Finished $i $n"
    done
 done < ../migrations.list
@@ -286,10 +286,10 @@ while read i
    for n in {1..10}
       do
       a=$(awk '/RD.20/{f=1}/\/\//{f=0}f&&/RS/{print $2,$5,$6}' \
-         /work/frr6/SIMS/Sim1.${i}.${n}.psmc | \
+         Sim3.${i}.${n}.psmc | \
          cut -f3 -d" " | \
          tr "\n" "\t")
-      echo -e "${i}\t${n}\t${a}" >> Sim3.tMRCAbins.tsv
+      echo -e "${i}\t${n}\t${a}" >> ../Sim3.tMRCAbins.tsv
       echo "Finished $i $n"
    done
 done < ../mutations.list
