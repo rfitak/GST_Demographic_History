@@ -248,7 +248,7 @@ echo "" >> obs.tMRCAbins.tsv
 cd SIM1
 while read i
    do
-   n=$(echo "$i" | cut -d" " -f1)
+   n=$(echo "$i" | tr " " ".")
    a=$(awk '/RD.20/{f=1}/\/\//{f=0}f&&/RS/{print $2,$5,$6}' \
       Sim1.${n}.psmc | \
       cut -f3 -d" " | \
