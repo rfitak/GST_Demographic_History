@@ -248,16 +248,13 @@ echo "" >> obs.tMRCAbins.tsv
 cd SIM1
 while read i
    do
-   i=$(echo "$i" | cut -d" " -f1)
-   for n in {1..10}
-      do
-      a=$(awk '/RD.20/{f=1}/\/\//{f=0}f&&/RS/{print $2,$5,$6}' \
-         Sim1.${i}.${n}.psmc | \
-         cut -f3 -d" " | \
-         tr "\n" "\t")
-      echo -e "${i}\t${n}\t${a}" >> ../Sim1.tMRCAbins.tsv
-      echo "Finished $i $n"
-   done
+   n=$(echo "$i" | cut -d" " -f1)
+   a=$(awk '/RD.20/{f=1}/\/\//{f=0}f&&/RS/{print $2,$5,$6}' \
+      Sim1.${n}.psmc | \
+      cut -f3 -d" " | \
+      tr "\n" "\t")
+   echo -e "${i}\t${a}" | tr " " "\t" >> ../Sim1.tMRCAbins.tsv
+   echo "Finished $i"
 done < ../migrations.list
 cd ..
 
@@ -265,16 +262,13 @@ cd ..
 cd SIM2
 while read i
    do
-   i=$(echo "$i" | cut -d" " -f1)
-   for n in {1..10}
-      do
-      a=$(awk '/RD.20/{f=1}/\/\//{f=0}f&&/RS/{print $2,$5,$6}' \
-         Sim2.${i}.${n}.psmc | \
-         cut -f3 -d" " | \
-         tr "\n" "\t")
-      echo -e "${i}\t${n}\t${a}" >> ../Sim2.tMRCAbins.tsv
-      echo "Finished $i $n"
-   done
+   n=$(echo "$i" | tr " " ".")
+   a=$(awk '/RD.20/{f=1}/\/\//{f=0}f&&/RS/{print $2,$5,$6}' \
+      Sim2.${n}.psmc | \
+      cut -f3 -d" " | \
+      tr "\n" "\t")
+   echo -e "${i}\t${a}" | tr " " "\t" >> ../Sim2.tMRCAbins.tsv
+   echo "Finished $i"
 done < ../migrations.list
 cd ..
 
@@ -282,16 +276,13 @@ cd ..
 cd SIM3
 while read i
    do
-   i=$(echo "$i" | cut -d" " -f1)
-   for n in {1..10}
-      do
-      a=$(awk '/RD.20/{f=1}/\/\//{f=0}f&&/RS/{print $2,$5,$6}' \
-         Sim3.${i}.${n}.psmc | \
-         cut -f3 -d" " | \
-         tr "\n" "\t")
-      echo -e "${i}\t${n}\t${a}" >> ../Sim3.tMRCAbins.tsv
-      echo "Finished $i $n"
-   done
+   n=$(echo "$i" | tr " " ".")
+   a=$(awk '/RD.20/{f=1}/\/\//{f=0}f&&/RS/{print $2,$5,$6}' \
+      Sim3.${n}.psmc | \
+      cut -f3 -d" " | \
+      tr "\n" "\t")
+   echo -e "${i}\t${a}" | tr " " "\t" >> ../Sim3.tMRCAbins.tsv
+   echo "Finished $i"
 done < ../mutations.list
 cd ..
 ```
