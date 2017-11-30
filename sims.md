@@ -353,19 +353,19 @@ Here, we build a final data table of our results (Results.table), which we will 
 ```bash
 # Sim 1
 cat \
-   <(echo -e "Sim\tm_or_u\trep\tJSD) \
-   <(paste <(cat migrations.list | sed "s/^./Sim1 &/g") Sim1.tMRCAbins.tsv) | \
+   <(echo -e "Sim\tm_or_u\trep\tJSD") \
+   <(paste <(cat migrations.list | sed "s/^./Sim1 &/g") <(sed '1d' Sim1.JS.distances)) | \
    tr " " "\t" > Results.table
 
 # Sim 2
 paste \
    <(cat migrations.list | sed "s/^./Sim2 &/g") \
-   Sim2.tMRCAbins.tsv | \
+   <(sed '1d' Sim2.JS.distances) | \
    tr " " "\t" >> Results.table
 
 # Sim 3
 paste \
    <(cat mutations.list | sed "s/^./Sim3 &/g") \
-   Sim3.tMRCAbins.tsv | \
+   <(sed '1d' Sim3.JS.distances) | \
    tr " " "\t" >> Results.table
 ```
