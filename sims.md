@@ -369,3 +369,39 @@ paste \
    <(sed '1d' Sim3.JS.distances) | \
    tr " " "\t" >> Results.table
 ```
+
+## Plotting
+Now we can generate various plots in R
+
+```R
+# Load ggplot library
+library(ggplot2)
+
+# Load data, convert Sim to a factor
+data = read.table("Results.table", header=T, sep="\t")
+data$Sim = as.factor(data$Sim)
+
+# Recale Mutation rates to migration rates (0,1)
+data[which(data$Sim == "Sim3"),2] = rescale(data[which(data$Sim == "Sim3"),2], c(0,1))
+
+# Get mean of all "neutral" simulations
+neutral = subset(subset(data, Sim=="Sim1" | Sim=="Sim2"), m_or_u=="0")
+neutral = rbind(neutral, subset(data, Sim=="Sim3" & m_or_u=="1"))
+mean(neutral$JSD)
+   # Result = 0.2083022
+
+# plotting
+   # colors = c("#bdbdbd", "#f0f0f0", "#636363")
+p = ggplot(data, aes(x=m_or_u, y=JSD, color=Sim))
+p = p + stat_summary(geom="ribbon", fun.ymin="min", fun.ymax="max", aes(fill=Sim), alpha=0.3)
+p = p + stat_summary(geom="line", fun.y="mean", aes(color=Sim))
+p = p + scale_x_log10(expand=c(0,0))
+p = p + geom_hline(yintercept = mean(neutral$JSD), size=1, linetype=2)
+   # p = p + scale_fill_manual(values=colors)
+   # p = p + scale_colour_manual(values=colors)
+p = p + ylab("D")
+p = p+ xlab("Migration Rate")
+p = p + theme_bw()
+p = p + theme(axis.text = element_text(size = 14), axis.title = element_text(size = 18), legend.position="none")
+
+```
