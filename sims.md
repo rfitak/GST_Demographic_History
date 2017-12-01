@@ -381,8 +381,11 @@ library(ggplot2)
 data = read.table("Results.table", header=T, sep="\t")
 data$Sim = as.factor(data$Sim)
 
-# Recale Mutation rates to migration rates (0,1)
-data[which(data$Sim == "Sim3"),2] = rescale(data[which(data$Sim == "Sim3"),2], c(0,1))
+# Recale Mutation rates to migration rates (1e-6,1)
+data[which(data$Sim == "Sim3"),2] = rescale(data[which(data$Sim == "Sim3"),2], c(1e-6,1))
+
+# Change rates of 0 to 1e-7 (to avoid log10 errors)
+#data[which(data$m_or_u == 0),2] = 1.0001e-06
 
 # Get mean of all "neutral" simulations
 neutral = subset(subset(data, Sim=="Sim1" | Sim=="Sim2"), m_or_u=="0")
