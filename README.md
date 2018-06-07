@@ -5,7 +5,7 @@ Fitak, R & Johnsen, S (in press): Green sea turtle (*Chelonia mydas*) population
 
 Most of the data, including VCF files of SNPs and results of the simulations are available at:  
 
-Fitak, Robert; Johnsen, Sönke (2018): Single nucleotide polymorphisms and PSMC results in the green sea turtle *Chelonia mydas*. PANGAEA, [https://doi.pangaea.de/10.1594/PANGAEA.890759](https://doi.pangaea.de/10.1594/PANGAEA.890759)  
+Fitak, R & Johnsen, S (2018): Single nucleotide polymorphisms and PSMC results in the green sea turtle *Chelonia mydas*. PANGAEA, [https://doi.pangaea.de/10.1594/PANGAEA.890759](https://doi.pangaea.de/10.1594/PANGAEA.890759)  
 
 Some ancillary data files and custom scripts are also available in the [Data](./Data) folder.
 
